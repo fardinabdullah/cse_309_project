@@ -1,139 +1,441 @@
 import { useEffect, useState } from "react";
 import {
-    getWorkspaces,
-    createWorkspace,
-    deleteWorkspace
+  getWorkspaces,
+  createWorkspace,
+  deleteWorkspace,
+  updateWorkspace,
 } from "../api/workspaceApi";
 
 
 function WorkspaceManager() {
 
-    const [workspaces, setWorkspaces] = useState([]);
+  const [workspaces, setWorkspaces] = useState([]);
 
-    const [form, setForm] = useState({
-        name: "",
-        description: "",
-        owner_id: ""
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    owner_id: ""
+  });
+
+
+  const [editingId, setEditingId] = useState(null);
+
+
+  // Load workspaces
+  useEffect(() => {
+
+    loadWorkspaces();
+
+  }, []);
+
+
+
+  async function loadWorkspaces(){
+
+    try{
+
+      const response = await getWorkspaces();
+
+      setWorkspaces(response.data);
+
+    }
+
+    catch(error){
+
+      console.error(
+        "Failed to load workspaces",
+        error
+      );
+
+    }
+
+  }
+
+
+
+  // Handle input
+  function handleChange(e){
+
+    setFormData({
+
+      ...formData,
+
+      [e.target.name]: e.target.value
+
+    });
+
+  }
+
+
+
+  // Create / Update
+  async function handleSubmit(e){
+
+    e.preventDefault();
+
+
+    try{
+
+
+      if(editingId){
+
+        await updateWorkspace(
+          editingId,
+          formData
+        );
+
+        setEditingId(null);
+
+      }
+
+
+      else{
+
+        await createWorkspace(
+          formData
+        );
+
+      }
+
+
+      setFormData({
+
+        name:"",
+        description:"",
+        owner_id:""
+
+      });
+
+
+      loadWorkspaces();
+
+
+    }
+
+    catch(error){
+
+      console.error(
+        "Operation failed",
+        error
+      );
+
+    }
+
+  }
+
+
+
+
+  // Delete
+  async function handleDelete(id){
+
+    try{
+
+      await deleteWorkspace(id);
+
+      loadWorkspaces();
+
+    }
+
+    catch(error){
+
+      console.error(
+        "Delete failed",
+        error
+      );
+
+    }
+
+  }
+
+
+
+
+  // Edit button
+  function handleEdit(workspace){
+
+
+    setEditingId(
+      workspace._id
+    );
+
+
+    setFormData({
+
+      name: workspace.name,
+
+      description:
+      workspace.description,
+
+      owner_id:
+      workspace.owner_id
+
     });
 
 
-    const loadWorkspaces = async () => {
-        const data = await getWorkspaces();
-        setWorkspaces(data);
-    };
+  }
 
 
-    useEffect(() => {
-        loadWorkspaces();
-    }, []);
 
 
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
+return (
+
+<div className="workspace-container">
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+<div className="app-header">
 
-        await createWorkspace(form);
-
-        setForm({
-            name: "",
-            description: "",
-            owner_id: ""
-        });
-
-        loadWorkspaces();
-    };
+<h1>
+Smart Workspace Manager
+</h1>
 
 
-    const handleDelete = async (id) => {
-        await deleteWorkspace(id);
-        loadWorkspaces();
-    };
+<p>
+Manage your research and project workspaces
+</p>
 
 
-    return (
-        <div>
-
-            <h1>Smart Workspace Manager</h1>
+</div>
 
 
-            <form onSubmit={handleSubmit}>
-
-                <input
-                    name="name"
-                    placeholder="Workspace Name"
-                    value={form.name}
-                    onChange={handleChange}
-                />
 
 
-                <input
-                    name="description"
-                    placeholder="Description"
-                    value={form.description}
-                    onChange={handleChange}
-                />
+<div className="dashboard-grid">
 
 
-                <input
-                    name="owner_id"
-                    placeholder="Owner ID"
-                    value={form.owner_id}
-                    onChange={handleChange}
-                />
+
+{/* CREATE FORM */}
+
+<div className="card">
 
 
-                <button type="submit">
-                    Create Workspace
-                </button>
+<h2>
 
-            </form>
+{editingId
+?
+"Update Workspace"
+:
+"Create Workspace"}
 
-
-            <hr />
-
-
-            <h2>Workspaces</h2>
+</h2>
 
 
-            {
-                workspaces.map((workspace) => (
 
-                    <div key={workspace._id}>
-
-                        <h3>
-                            {workspace.name}
-                        </h3>
-
-                        <p>
-                            {workspace.description}
-                        </p>
-
-                        <p>
-                            Owner: {workspace.owner_id}
-                        </p>
+<form onSubmit={handleSubmit}>
 
 
-                        <button
-                            onClick={() => handleDelete(workspace._id)}
-                        >
-                            Delete
-                        </button>
+<input
 
-                    </div>
+type="text"
 
-                ))
-            }
+name="name"
+
+placeholder="Workspace Name"
+
+value={formData.name}
+
+onChange={handleChange}
+
+/>
 
 
-        </div>
-    );
+
+<textarea
+
+name="description"
+
+placeholder="Description"
+
+value={formData.description}
+
+onChange={handleChange}
+
+/>
+
+
+
+<input
+
+type="text"
+
+name="owner_id"
+
+placeholder="Owner ID"
+
+value={formData.owner_id}
+
+onChange={handleChange}
+
+/>
+
+
+
+<button
+
+className="primary-btn"
+
+type="submit"
+
+>
+
+{editingId
+?
+"Update Workspace"
+:
+"Create Workspace"}
+
+</button>
+
+
+
+</form>
+
+
+
+</div>
+
+
+
+
+
+{/* WORKSPACE LIST */}
+
+
+<div className="card">
+
+
+<h2 className="section-title">
+
+Workspaces
+
+</h2>
+
+
+
+<div className="workspace-list">
+
+
+
+{
+
+workspaces.length === 0
+
+?
+
+<p className="empty-message">
+
+No workspaces available
+
+</p>
+
+
+:
+
+
+workspaces.map((workspace)=>(
+
+
+<div
+
+className="workspace-card"
+
+key={workspace._id}
+
+>
+
+
+<h3>
+
+{workspace.name}
+
+</h3>
+
+
+
+<p>
+
+{workspace.description}
+
+</p>
+
+
+
+<p>
+
+<strong>
+Owner:
+</strong>
+
+{" "}
+
+{workspace.owner_id}
+
+</p>
+
+
+
+
+<button
+
+className="edit-btn"
+
+onClick={()=>
+handleEdit(workspace)
+}
+
+>
+
+Edit
+
+</button>
+
+
+
+
+<button
+
+className="delete-btn"
+
+onClick={()=>
+handleDelete(workspace._id)
+}
+
+>
+
+Delete
+
+</button>
+
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+);
+
+
 }
 
 

@@ -1,184 +1,235 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* Main Application */
+#root {
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
 }
 
-.hero {
-  position: relative;
 
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+/* Main Container */
+.workspace-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 25px;
 }
 
-#center {
+
+/* Header */
+.app-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-header h1 {
+  font-size: 38px;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.app-header p {
+  color: #64748b;
+  font-size: 17px;
+}
+
+
+/* Card Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 30px;
+}
+
+
+/* Common Card */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+
+/* Form Section */
+.card h2 {
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+
+/* Inputs */
+input,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
+  font-size: 15px;
+  outline: none;
+
+  transition: 0.2s;
+}
+
+
+input:focus,
+textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+
+textarea {
+  height: 100px;
+  resize: none;
+}
+
+
+/* Buttons */
+button {
+  border: none;
+  cursor: pointer;
+
+  padding: 12px 18px;
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+
+.primary-btn {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+}
+
+
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
+
+/* Workspace List */
+.workspace-list {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  gap: 20px;
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
 
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
+/* Workspace Card */
+.workspace-card {
 
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
+  background: white;
 
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  padding: 22px;
+
+  border-radius: 15px;
+
+  box-shadow:
+  0 8px 20px rgba(0,0,0,0.07);
+
+  transition: transform .2s;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
 
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.workspace-card:hover {
+  transform: translateY(-4px);
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
 
-  .logo {
-    height: 18px;
-  }
+.workspace-card h3 {
 
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
+  color:#0f172a;
 
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
+  margin-bottom:10px;
 
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+
+.workspace-card p {
+
+  color:#475569;
+
+  margin:8px 0;
+
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+/* Action Buttons */
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.delete-btn {
+
+  background:#ef4444;
+
+  color:white;
+
+  margin-top:15px;
+
+}
+
+
+.delete-btn:hover {
+
+  background:#dc2626;
+
+}
+
+
+.edit-btn {
+
+  background:#22c55e;
+
+  color:white;
+
+  margin-right:10px;
+
+}
+
+
+/* Section Title */
+
+.section-title {
+
+  margin-bottom:20px;
+
+  color:#1e293b;
+
+}
+
+
+/* Empty State */
+
+.empty-message {
+
+  color:#64748b;
+
+  text-align:center;
+
+  padding:30px;
+
+}
+
+
+/* Responsive */
+
+@media(max-width:900px){
+
+.dashboard-grid{
+
+grid-template-columns:1fr;
+
+}
+
+
+.app-header h1{
+
+font-size:30px;
+
+}
+
 }

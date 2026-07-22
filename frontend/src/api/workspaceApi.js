@@ -1,37 +1,58 @@
 import axios from "axios";
 
+
+// Backend API URL
 const API_URL = "http://127.0.0.1:8000/workspaces";
 
+
+// Get all workspaces
 export const getWorkspaces = async () => {
-    const response = await axios.get(`${API_URL}/`);
-    return response.data;
+
+    return await axios.get(`${API_URL}/`);
+
 };
 
 
-export const createWorkspace = async (workspace) => {
-    const response = await axios.post(
+// Create a new workspace
+export const createWorkspace = async (workspaceData) => {
+
+    return await axios.post(
         `${API_URL}/`,
-        workspace
+        workspaceData
     );
 
-    return response.data;
 };
 
 
-export const updateWorkspace = async (id, workspace) => {
-    const response = await axios.put(
-        `${API_URL}/${id}`,
-        workspace
-    );
+// Get single workspace
+export const getWorkspaceById = async (id) => {
 
-    return response.data;
-};
-
-
-export const deleteWorkspace = async (id) => {
-    const response = await axios.delete(
+    return await axios.get(
         `${API_URL}/${id}`
     );
 
-    return response.data;
+};
+
+
+// Update workspace
+export const updateWorkspace = async (
+    id,
+    workspaceData
+) => {
+
+    return await axios.put(
+        `${API_URL}/${id}`,
+        workspaceData
+    );
+
+};
+
+
+// Delete workspace
+export const deleteWorkspace = async (id) => {
+
+    return await axios.delete(
+        `${API_URL}/${id}`
+    );
+
 };
