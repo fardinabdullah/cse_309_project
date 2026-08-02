@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from models.workspace import Workspace
 
 from services.workspace_service import (
@@ -9,6 +9,8 @@ from services.workspace_service import (
     delete_workspace
 )
 
+from utils.auth_dependency import get_current_user
+
 
 router = APIRouter(
     prefix="/workspaces",
@@ -17,25 +19,40 @@ router = APIRouter(
 
 
 @router.post("/")
-async def create(data: Workspace):
+async def create(
+    data: Workspace,
+    current_user = Depends(get_current_user)
+):
     return await create_workspace(data)
 
 
 @router.get("/")
-async def read_all():
+async def read_all(
+    current_user = Depends(get_current_user)
+):
     return await get_workspaces()
 
 
 @router.get("/{workspace_id}")
-async def read_one(workspace_id: str):
+async def read_one(
+    workspace_id: str,
+    current_user = Depends(get_current_user)
+):
     return await get_workspace(workspace_id)
 
 
 @router.put("/{workspace_id}")
-async def update(workspace_id: str, data: Workspace):
+async def update(
+    workspace_id: str,
+    data: Workspace,
+    current_user = Depends(get_current_user)
+):
     return await update_workspace(workspace_id, data)
 
 
 @router.delete("/{workspace_id}")
-async def delete(workspace_id: str):
+async def delete(
+    workspace_id: str,
+    current_user = Depends(get_current_user)
+):
     return await delete_workspace(workspace_id)
