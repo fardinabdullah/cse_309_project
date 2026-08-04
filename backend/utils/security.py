@@ -12,7 +12,7 @@ pwd_context = CryptContext(
 
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
-    "your-secret-key-change-this"
+    "23da50a8ff3d09851b1b95a33e125fed7e1262b27312fdecacad68f6d1d93631"
 )
 
 ALGORITHM = "HS256"

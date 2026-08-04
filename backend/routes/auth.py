@@ -1,6 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+
 from models.user import UserCreate, UserLogin
 from services.auth_service import create_user, login_user
+
+from utils.auth_dependency import get_current_user
 
 
 router = APIRouter()
@@ -40,3 +43,11 @@ async def login(data: UserLogin):
         )
 
     return token
+
+
+
+@router.get("/me")
+async def get_me(
+    current_user = Depends(get_current_user)
+):
+    return current_user

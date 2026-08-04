@@ -1,58 +1,74 @@
 import axios from "axios";
 
 
-// Backend API URL
-const API_URL = "http://127.0.0.1:8000/workspaces";
+const API_URL = "http://127.0.0.1:8000";
 
 
-// Get all workspaces
+
+const getHeaders = () => {
+
+    const token = localStorage.getItem("token");
+
+    console.log("TOKEN FROM STORAGE:", token);
+
+
+    return {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
+};
+
+
+
+// GET workspaces
 export const getWorkspaces = async () => {
 
-    return await axios.get(`${API_URL}/`);
-
-};
-
-
-// Create a new workspace
-export const createWorkspace = async (workspaceData) => {
-
-    return await axios.post(
-        `${API_URL}/`,
-        workspaceData
+    const response = await axios.get(
+        `${API_URL}/workspaces/`,
+        getHeaders()
     );
 
+    return response.data;
 };
 
 
-// Get single workspace
-export const getWorkspaceById = async (id) => {
 
-    return await axios.get(
-        `${API_URL}/${id}`
+// CREATE workspace
+export const createWorkspace = async (data) => {
+
+    const response = await axios.post(
+        `${API_URL}/workspaces/`,
+        data,
+        getHeaders()
     );
 
+    return response.data;
 };
 
 
-// Update workspace
-export const updateWorkspace = async (
-    id,
-    workspaceData
-) => {
 
-    return await axios.put(
-        `${API_URL}/${id}`,
-        workspaceData
+// UPDATE workspace
+export const updateWorkspace = async (id, data) => {
+
+    const response = await axios.put(
+        `${API_URL}/workspaces/${id}`,
+        data,
+        getHeaders()
     );
 
+    return response.data;
 };
 
 
-// Delete workspace
+
+// DELETE workspace
 export const deleteWorkspace = async (id) => {
 
-    return await axios.delete(
-        `${API_URL}/${id}`
+    const response = await axios.delete(
+        `${API_URL}/workspaces/${id}`,
+        getHeaders()
     );
 
+    return response.data;
 };
