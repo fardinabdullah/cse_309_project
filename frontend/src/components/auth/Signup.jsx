@@ -1,137 +1,222 @@
 import { useState } from "react";
-import { signup } from "../../api/authApi";
+import axios from "axios";
+import { 
+    FiUser, 
+    FiMail, 
+    FiLock, 
+    FiAlertCircle,
+    FiEye,
+    FiEyeOff,
+    FiArrowRight
+} from "react-icons/fi";
+import "../../styles/login.css";
 
-
-function Signup({ setPage }) {
-
-
+function Signup({ onSwitchToLogin }) {  // ← Only need this prop
     const [formData, setFormData] = useState({
-
         name: "",
         email: "",
-        password: ""
-
+        password: "",
+        confirmPassword: ""
     });
-
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
-
-        const { name, value } = e.target;
-
-
         setFormData({
-
             ...formData,
-            [name]: value
-
+            [e.target.name]: e.target.value
         });
-
     };
 
-
-
-    const handleSubmit = async (e) => {
-
+    const handleSignup = async (e) => {
         e.preventDefault();
+        setError("");
 
-
-        try {
-
-            await signup(formData);
-
-
-            alert("Signup successful");
-
-
-            setPage("login");
-
-
-        } catch (error) {
-
-            console.log(error);
-
-            alert("Signup failed");
-
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            return;
         }
 
+        if (formData.password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await axios.post(
+                "http://127.0.0.1:8000/auth/register",
+                {
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password
+                }
+            );
+
+            setLoading(false);
+            
+            // After successful signup, switch to login
+            if (onSwitchToLogin) {
+                onSwitchToLogin();
+            }
+
+        } catch (error) {
+            console.log(error);
+            setError(error.response?.data?.detail || "Signup failed. Please try again.");
+            setLoading(false);
+        }
     };
 
-
-
     return (
+        <div className="login-page">
+            <div className="grid-pattern"></div>
 
-        <div>
+            <div className="login-brand">
+                <div className="brand-badge">
+                    <span className="dot"></span>
+                    <span>Smart Workspace Manager</span>
+                </div>
 
-            <h2>Signup</h2>
+                <h1>Smart Workspace Manager</h1>
+                <p className="tagline">
+                    Join thousands of researchers and professionals 
+                    organizing their work efficiently.
+                </p>
 
+                <div className="features">
+                    <div className="feature-item">
+                        <span className="icon blue"><FiUser size={18} /></span>
+                        <span>
+                            <strong>Free to start</strong> — No credit card required
+                        </span>
+                    </div>
+                    <div className="feature-item">
+                        <span className="icon purple"><FiZap size={18} /></span>
+                        <span>
+                            <strong>AI-Powered</strong> — Smart workspace management
+                        </span>
+                    </div>
+                    <div className="feature-item">
+                        <span className="icon green"><FiUsers size={18} /></span>
+                        <span>
+                            <strong>Team Ready</strong> — Collaborate with your team
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-            <form onSubmit={handleSubmit}>
+            <div className="login-card">
+                <div className="card-header">
+                    <div className="greeting">CREATE ACCOUNT</div>
+                    <h2>Get started for free</h2>
+                    <p className="subtitle">Join the Smart Workspace community</p>
+                </div>
 
+                {error && (
+                    <div className="error-message">
+                        <FiAlertCircle className="error-icon" />
+                        {error}
+                    </div>
+                )}
 
-                <input
+                <form onSubmit={handleSignup}>
+                    <div className="input-group">
+                        <label>Full Name <span className="required">*</span></label>
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Enter your full name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
 
-                    type="text"
+                    <div className="input-group">
+                        <label>Email Address <span className="required">*</span></label>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
 
-                    name="name"
+                    <div className="input-group">
+                        <label>Password <span className="required">*</span></label>
+                        <div className="password-box">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Create a password (min 6 chars)"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
 
-                    placeholder="Name"
+                    <div className="input-group">
+                        <label>Confirm Password <span className="required">*</span></label>
+                        <div className="password-box">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="confirmPassword"
+                                placeholder="Confirm your password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="show-btn"
+                            >
+                                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                            </button>
+                        </div>
+                    </div>
 
-                    value={formData.name}
+                    <button
+                        className="login-button"
+                        type="submit"
+                        disabled={loading}
+                    >
+                        <span className="btn-content">
+                            {loading ? (
+                                <>
+                                    <span className="spinner"></span>
+                                    Creating account...
+                                </>
+                            ) : (
+                                <>
+                                    Create Account <FiArrowRight />
+                                </>
+                            )}
+                        </span>
+                    </button>
+                </form>
 
-                    onChange={handleChange}
-
-                />
-
-
-
-                <input
-
-                    type="email"
-
-                    name="email"
-
-                    placeholder="Email"
-
-                    value={formData.email}
-
-                    onChange={handleChange}
-
-                />
-
-
-
-                <input
-
-                    type="password"
-
-                    name="password"
-
-                    placeholder="Password"
-
-                    value={formData.password}
-
-                    onChange={handleChange}
-
-                />
-
-
-
-                <button type="submit">
-
-                    Signup
-
-                </button>
-
-
-            </form>
-
-
+                <p className="signup-link">
+                    Already have an account?{" "}
+                    <span 
+                        className="signup-text"
+                        onClick={() => {
+                            if (onSwitchToLogin) {
+                                onSwitchToLogin();
+                            }
+                        }}
+                    >
+                        Login here
+                    </span>
+                </p>
+            </div>
         </div>
-
     );
-
 }
-
 
 export default Signup;
