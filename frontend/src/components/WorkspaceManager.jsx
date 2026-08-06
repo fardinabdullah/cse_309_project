@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";  // importing the hooks
 import {
   getWorkspaces,
   createWorkspace,
@@ -7,11 +7,12 @@ import {
 } from "../api/workspaceApi";
 
 
-function WorkspaceManager() {
+function WorkspaceManager() {                        // react functional component
 
-  const [workspaces, setWorkspaces] = useState([]);
+  const [workspaces, setWorkspaces] = useState([]);  //react creates a variable workspaces intitially empty array set workspace vhanges value
+                                                     // this stores all workspace data fetched from backend
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({   // this handles user input when creating or updating a workspace
     name: "",
     description: "",
     owner_id: ""
@@ -21,8 +22,8 @@ function WorkspaceManager() {
   const [editingId, setEditingId] = useState(null);
 
 
-  // Load workspaces
-  useEffect(() => {
+  // Load workspaces   
+  useEffect(() => {   // this runs automatically when the components appears
 
     loadWorkspaces();
 

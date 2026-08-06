@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post("/")
-async def create(data: Workspace):
+async def create(data: Workspace):     # fastapi automatically creates the parameter data
     return await create_workspace(data)
 
 

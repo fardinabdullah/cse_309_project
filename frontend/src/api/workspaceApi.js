@@ -16,7 +16,7 @@ export const getWorkspaces = async () => {
 // Create a new workspace
 export const createWorkspace = async (workspaceData) => {
 
-    return await axios.post(
+    return await axios.post(     // creates the HTTP request and the request left the frontend here to go backend
         `${API_URL}/`,
         workspaceData
     );

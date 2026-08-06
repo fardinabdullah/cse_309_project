@@ -8,3 +8,4 @@ class Workspace(BaseModel):
     description: str
     owner_id: Optional[str] = None
     created_at: Optional[str] = None
+
