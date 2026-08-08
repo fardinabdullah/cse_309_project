@@ -11,3 +11,5 @@ client = AsyncIOMotorClient(MONGO_URL)
 database = client["smart_workspace_manager"]
 
 workspace_collection = database["workspaces"]
+
+user_collection = database["users"]
