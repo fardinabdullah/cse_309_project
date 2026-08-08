@@ -18,25 +18,19 @@ import {
 import "../styles/workspace.css";
 
 function WorkspaceManager() {
+    const [workspaces, setWorkspaces] = useState([]);
+    const [formData, setFormData] = useState({
+        name: "",
+        description: ""
+    });
+    const [editingId, setEditingId] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-  const [workspaces, setWorkspaces] = useState([]);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    owner_id: ""
-  });
-
-
-  const [editingId, setEditingId] = useState(null);
-
-
-  // Load workspaces
-  useEffect(() => {
-
-    loadWorkspaces();
-
-  }, []);
+    useEffect(() => {
+        loadWorkspaces();
+    }, []);
 
     // ✅ Helper function to scroll to notification
     const scrollToNotification = () => {

@@ -21,9 +21,12 @@ router = APIRouter(
 
 @router.post("/")
 <<<<<<< HEAD
+<<<<<<< HEAD
 async def create(data: Workspace):     # fastapi automatically creates the parameter data
     return await create_workspace(data)
 =======
+=======
+>>>>>>> 36adfead945e0925849a294c1ade8e106bacf0f1
 async def create(
     data: Workspace,
     current_user = Depends(get_current_user)
@@ -38,7 +41,10 @@ async def create(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+<<<<<<< HEAD
 >>>>>>> #7-user-dashboard
+=======
+>>>>>>> 36adfead945e0925849a294c1ade8e106bacf0f1
 
 
 @router.get("/")

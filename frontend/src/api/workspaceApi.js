@@ -34,48 +34,38 @@ export const createWorkspace = async (data) => {
 
 // ✅ GET ALL WORKSPACES
 export const getWorkspaces = async () => {
-
-    return await axios.get(`${API_URL}/`);
-
+    try {
+        const response = await api.get("/workspaces/");
+        return response.data;
+    } catch (error) {
+        console.error("Get workspaces error:", error);
+        throw error;
+    }
 };
 
-
-// Create a new workspace
-export const createWorkspace = async (workspaceData) => {
-
-    return await axios.post(
-        `${API_URL}/`,
-        workspaceData
-    );
-
+// ✅ GET SINGLE WORKSPACE
+export const getWorkspace = async (id) => {
+    try {
+        const response = await api.get(`/workspaces/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Get workspace error:", error);
+        throw error;
+    }
 };
 
-
-// Get single workspace
-export const getWorkspaceById = async (id) => {
-
-    return await axios.get(
-        `${API_URL}/${id}`
-    );
-
+// ✅ UPDATE WORKSPACE
+export const updateWorkspace = async (id, data) => {
+    try {
+        const response = await api.put(`/workspaces/${id}`, data);
+        return response.data;
+    } catch (error) {
+        console.error("Update workspace error:", error);
+        throw error;
+    }
 };
 
-
-// Update workspace
-export const updateWorkspace = async (
-    id,
-    workspaceData
-) => {
-
-    return await axios.put(
-        `${API_URL}/${id}`,
-        workspaceData
-    );
-
-};
-
-
-// Delete workspace
+// ✅ DELETE WORKSPACE
 export const deleteWorkspace = async (id) => {
     try {
         const response = await api.delete(`/workspaces/${id}`);
