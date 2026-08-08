@@ -44,7 +44,7 @@ body {
     text-align: left !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 auto !important;
+    margin: 0 !important;  /* ← FIXED: Removed auto */
     border-inline: none !important;
     min-height: 100svh !important;
     min-height: 100dvh !important;

@@ -7,11 +7,13 @@ import {
     FiAlertCircle,
     FiEye,
     FiEyeOff,
-    FiArrowRight
+    FiArrowRight,
+    FiUsers,
+    FiZap
 } from "react-icons/fi";
 import "../../styles/login.css";
 
-function Signup({ onSwitchToLogin }) {  // ← Only need this prop
+function Signup({ onSwitchToLogin }) {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -46,8 +48,9 @@ function Signup({ onSwitchToLogin }) {  // ← Only need this prop
         setLoading(true);
 
         try {
+            // ✅ FIXED: Changed from /auth/register to /auth/signup
             const response = await axios.post(
-                "http://127.0.0.1:8000/auth/register",
+                "http://127.0.0.1:8000/auth/signup",
                 {
                     name: formData.name,
                     email: formData.email,
@@ -57,7 +60,6 @@ function Signup({ onSwitchToLogin }) {  // ← Only need this prop
 
             setLoading(false);
             
-            // After successful signup, switch to login
             if (onSwitchToLogin) {
                 onSwitchToLogin();
             }

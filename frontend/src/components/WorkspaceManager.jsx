@@ -32,6 +32,19 @@ function WorkspaceManager() {
         loadWorkspaces();
     }, []);
 
+    // ✅ Helper function to scroll to notification
+    const scrollToNotification = () => {
+        setTimeout(() => {
+            const notification = document.querySelector('.notification');
+            if (notification) {
+                notification.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }, 100);
+    };
+
     const loadWorkspaces = async () => {
         try {
             const data = await getWorkspaces();
@@ -62,17 +75,10 @@ function WorkspaceManager() {
         setError("");
         setSuccess("");
 
-        // Frontend duplicate check - No alert, only in-app notification
         if (isDuplicateName(formData.name, editingId)) {
             const errorMsg = `A workspace named "${formData.name}" already exists. Please use a different name.`;
             setError(errorMsg);
-            // Scroll to error notification
-            setTimeout(() => {
-                const errorEl = document.querySelector('.notification.error');
-                if (errorEl) {
-                    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 100);
+            scrollToNotification(); // ✅ Auto-scroll to error
             setTimeout(() => setError(""), 8000);
             return;
         }
@@ -83,9 +89,11 @@ function WorkspaceManager() {
             if (editingId) {
                 await updateWorkspace(editingId, formData);
                 setSuccess("Workspace updated successfully");
+                scrollToNotification(); // ✅ Auto-scroll to success
             } else {
                 await createWorkspace(formData);
                 setSuccess("Workspace created successfully");
+                scrollToNotification(); // ✅ Auto-scroll to success
             }
 
             setEditingId(null);
@@ -106,13 +114,7 @@ function WorkspaceManager() {
             }
             
             setError(errorMsg);
-            // Scroll to error notification
-            setTimeout(() => {
-                const errorEl = document.querySelector('.notification.error');
-                if (errorEl) {
-                    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 100);
+            scrollToNotification(); // ✅ Auto-scroll to error
             
         } finally {
             setLoading(false);
@@ -132,6 +134,7 @@ function WorkspaceManager() {
             await deleteWorkspace(id);
             await loadWorkspaces();
             setSuccess("Workspace deleted successfully");
+            scrollToNotification(); // ✅ Auto-scroll to success
             setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
             console.log("DELETE ERROR:", error);
@@ -140,12 +143,7 @@ function WorkspaceManager() {
                 errorMsg = error.response.data.detail;
             }
             setError(errorMsg);
-            setTimeout(() => {
-                const errorEl = document.querySelector('.notification.error');
-                if (errorEl) {
-                    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 100);
+            scrollToNotification(); // ✅ Auto-scroll to error
             setTimeout(() => setError(""), 4000);
         }
     };
