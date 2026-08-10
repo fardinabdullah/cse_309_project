@@ -13,9 +13,16 @@ import {
     createWorkspace,
     getWorkspaces,
     deleteWorkspace,
-    updateWorkspace
+    updateWorkspace,
+    getWorkspace
 } from "../api/workspaceApi";
 import "../styles/workspace.css";
+
+import PaperUpload from './papers/PaperUpload';
+import PaperList from './papers/PaperList';
+import PaperSearch from './papers/PaperSearch';
+import PaperDashboard from './papers/PaperDashboard';
+import "../styles/papers.css";
 
 function WorkspaceManager() {
     const [workspaces, setWorkspaces] = useState([]);
@@ -27,12 +34,15 @@ function WorkspaceManager() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    
+    const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
+    const [selectedWorkspace, setSelectedWorkspace] = useState(null);
+    const [showPapers, setShowPapers] = useState(false);
 
     useEffect(() => {
         loadWorkspaces();
     }, []);
 
-    // ✅ Helper function to scroll to notification
     const scrollToNotification = () => {
         setTimeout(() => {
             const notification = document.querySelector('.notification');
@@ -78,7 +88,7 @@ function WorkspaceManager() {
         if (isDuplicateName(formData.name, editingId)) {
             const errorMsg = `A workspace named "${formData.name}" already exists. Please use a different name.`;
             setError(errorMsg);
-            scrollToNotification(); // ✅ Auto-scroll to error
+            scrollToNotification();
             setTimeout(() => setError(""), 8000);
             return;
         }
@@ -89,11 +99,11 @@ function WorkspaceManager() {
             if (editingId) {
                 await updateWorkspace(editingId, formData);
                 setSuccess("Workspace updated successfully");
-                scrollToNotification(); // ✅ Auto-scroll to success
+                scrollToNotification();
             } else {
                 await createWorkspace(formData);
                 setSuccess("Workspace created successfully");
-                scrollToNotification(); // ✅ Auto-scroll to success
+                scrollToNotification();
             }
 
             setEditingId(null);
@@ -114,7 +124,7 @@ function WorkspaceManager() {
             }
             
             setError(errorMsg);
-            scrollToNotification(); // ✅ Auto-scroll to error
+            scrollToNotification();
             
         } finally {
             setLoading(false);
@@ -134,7 +144,7 @@ function WorkspaceManager() {
             await deleteWorkspace(id);
             await loadWorkspaces();
             setSuccess("Workspace deleted successfully");
-            scrollToNotification(); // ✅ Auto-scroll to success
+            scrollToNotification();
             setTimeout(() => setSuccess(""), 3000);
         } catch (error) {
             console.log("DELETE ERROR:", error);
@@ -143,7 +153,7 @@ function WorkspaceManager() {
                 errorMsg = error.response.data.detail;
             }
             setError(errorMsg);
-            scrollToNotification(); // ✅ Auto-scroll to error
+            scrollToNotification();
             setTimeout(() => setError(""), 4000);
         }
     };
@@ -162,6 +172,39 @@ function WorkspaceManager() {
         setFormData({ name: "", description: "" });
     };
 
+    const handleWorkspaceClick = (workspace) => {
+        setSelectedWorkspaceId(workspace._id);
+        setSelectedWorkspace(workspace);
+        setShowPapers(true);
+    };
+
+    const handleBackToWorkspaces = () => {
+        setShowPapers(false);
+        setSelectedWorkspaceId(null);
+        setSelectedWorkspace(null);
+    };
+
+    const handlePaperUploadComplete = async () => {
+        await loadWorkspaces();
+        if (selectedWorkspaceId) {
+            const updated = workspaces.find(w => w._id === selectedWorkspaceId);
+            if (updated) {
+                setSelectedWorkspace(updated);
+            }
+        }
+    };
+
+    const handlePaperDeleted = async () => {
+        if (selectedWorkspaceId) {
+            try {
+                const response = await getWorkspace(selectedWorkspaceId);
+                setSelectedWorkspace(response);
+            } catch (error) {
+                console.error('Error refreshing papers:', error);
+            }
+        }
+    };
+
     return (
         <div className="workspace-page">
             <div className="workspace-bg">
@@ -177,18 +220,32 @@ function WorkspaceManager() {
                             <span className="dot"></span>
                             <span>Smart Workspace Manager</span>
                         </div>
-                        <h1>Your Workspaces</h1>
-                        <p className="subtitle">Manage your research and project workspaces efficiently</p>
+                        <h1>
+                            {showPapers ? selectedWorkspace?.name || 'Papers' : 'Your Workspaces'}
+                        </h1>
+                        <p className="subtitle">
+                            {showPapers 
+                                ? `Manage research papers in "${selectedWorkspace?.name}"`
+                                : 'Manage your research and project workspaces efficiently'
+                            }
+                        </p>
                     </div>
                     <div className="header-stats">
-                        <div className="stat-card">
-                            <span className="stat-number">{workspaces.length}</span>
-                            <span className="stat-label">Total Workspaces</span>
-                        </div>
+                        {!showPapers && (
+                            <div className="stat-card">
+                                <span className="stat-number">{workspaces.length}</span>
+                                <span className="stat-label">Total Workspaces</span>
+                            </div>
+                        )}
+                        {showPapers && selectedWorkspace && (
+                            <div className="stat-card">
+                                <span className="stat-number">{selectedWorkspace.papers?.length || 0}</span>
+                                <span className="stat-label">Papers</span>
+                            </div>
+                        )}
                     </div>
                 </header>
 
-                {/* Error Notification */}
                 {error && (
                     <div className="notification error" style={{
                         display: 'flex',
@@ -234,7 +291,6 @@ function WorkspaceManager() {
                     </div>
                 )}
 
-                {/* Success Notification */}
                 {success && (
                     <div className="notification success" style={{
                         display: 'flex',
@@ -280,137 +336,201 @@ function WorkspaceManager() {
                     </div>
                 )}
 
-                <div className="form-card">
-                    <div className="form-header">
-                        <h2>
-                            {editingId ? (
-                                <>
-                                    <FiEdit2 className="icon" />
-                                    Update Workspace
-                                </>
-                            ) : (
-                                <>
-                                    <FiPlus className="icon" />
-                                    Create New Workspace
-                                </>
+                {!showPapers && (
+                    <div className="form-card">
+                        <div className="form-header">
+                            <h2>
+                                {editingId ? (
+                                    <>
+                                        <FiEdit2 className="icon" />
+                                        Update Workspace
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiPlus className="icon" />
+                                        Create New Workspace
+                                    </>
+                                )}
+                            </h2>
+                            {editingId && (
+                                <button className="cancel-btn" onClick={cancelEdit}>
+                                    <FiX /> Cancel
+                                </button>
                             )}
-                        </h2>
-                        {editingId && (
-                            <button className="cancel-btn" onClick={cancelEdit}>
-                                <FiX /> Cancel
+                        </div>
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>
+                                    Workspace Name <span className="required">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Enter workspace name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <small className="helper-text">
+                                    Workspace names must be unique for your account
+                                </small>
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    Description <span className="required">*</span>
+                                </label>
+                                <textarea
+                                    name="description"
+                                    placeholder="Enter workspace description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    required
+                                    rows="3"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="submit-btn"
+                                disabled={loading}
+                            >
+                                <span className="btn-content">
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner"></span>
+                                            Saving...
+                                        </>
+                                    ) : editingId ? (
+                                        "Update Workspace"
+                                    ) : (
+                                        "Create Workspace"
+                                    )}
+                                </span>
                             </button>
+                        </form>
+                    </div>
+                )}
+
+                {showPapers && selectedWorkspaceId && (
+                    <>
+                        <button 
+                            onClick={handleBackToWorkspaces}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 20px',
+                                marginBottom: '20px',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                borderRadius: '10px',
+                                color: '#94a3b8',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                transition: 'all 0.3s',
+                                fontFamily: 'Inter, sans-serif'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.background = 'rgba(255,255,255,0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.background = 'rgba(255,255,255,0.05)';
+                            }}
+                        >
+                            Back to Workspaces
+                        </button>
+
+                        <PaperDashboard workspaceId={selectedWorkspaceId} />
+
+                        <PaperUpload 
+                            workspaceId={selectedWorkspaceId} 
+                            onUploadComplete={handlePaperUploadComplete}
+                        />
+
+                        <PaperSearch workspaceId={selectedWorkspaceId} />
+
+                        <PaperList 
+                            papers={selectedWorkspace?.papers || []} 
+                            workspaceId={selectedWorkspaceId}
+                            onPaperDeleted={handlePaperDeleted}
+                        />
+                    </>
+                )}
+
+                {!showPapers && (
+                    <div className="workspace-list">
+                        <div className="list-header">
+                            <h2>All Workspaces</h2>
+                            <span className="workspace-count">{workspaces.length} workspaces</span>
+                        </div>
+
+                        {workspaces.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-icon"><FiFolder size={48} /></div>
+                                <h3>No workspaces yet</h3>
+                                <p>Create your first workspace to get started</p>
+                            </div>
+                        ) : (
+                            <div className="workspace-grid">
+                                {workspaces.map((workspace) => (
+                                    <div 
+                                        key={workspace._id} 
+                                        className="workspace-card"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => handleWorkspaceClick(workspace)}
+                                    >
+                                        <div className="card-header">
+                                            <div className="card-icon">
+                                                {workspace.name.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="card-actions">
+                                                <button
+                                                    className="action-btn edit"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEdit(workspace);
+                                                    }}
+                                                    title="Edit"
+                                                >
+                                                    <FiEdit2 size={16} />
+                                                </button>
+                                                <button
+                                                    className="action-btn delete"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(workspace._id);
+                                                    }}
+                                                    title="Delete"
+                                                >
+                                                    <FiTrash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="card-body">
+                                            <h3>{workspace.name}</h3>
+                                            <p>{workspace.description}</p>
+                                            <small style={{ color: '#64748b', fontSize: '12px' }}>
+                                                Papers: {workspace.papers?.length || 0}
+                                            </small>
+                                        </div>
+
+                                        <div className="card-footer">
+                                            <span className="owner-tag">
+                                                <FiUsers size={12} /> {workspace.owner_id || "Unknown Owner"}
+                                            </span>
+                                            <span className="workspace-id">
+                                                ID: {workspace._id.slice(-8)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>
-                                Workspace Name <span className="required">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Enter workspace name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                            />
-                            <small className="helper-text">
-                                Workspace names must be unique for your account
-                            </small>
-                        </div>
-
-                        <div className="form-group">
-                            <label>
-                                Description <span className="required">*</span>
-                            </label>
-                            <textarea
-                                name="description"
-                                placeholder="Enter workspace description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                required
-                                rows="3"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="submit-btn"
-                            disabled={loading}
-                        >
-                            <span className="btn-content">
-                                {loading ? (
-                                    <>
-                                        <span className="spinner"></span>
-                                        Saving...
-                                    </>
-                                ) : editingId ? (
-                                    "Update Workspace"
-                                ) : (
-                                    "Create Workspace"
-                                )}
-                            </span>
-                        </button>
-                    </form>
-                </div>
-
-                <div className="workspace-list">
-                    <div className="list-header">
-                        <h2>All Workspaces</h2>
-                        <span className="workspace-count">{workspaces.length} workspaces</span>
-                    </div>
-
-                    {workspaces.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-icon"><FiFolder size={48} /></div>
-                            <h3>No workspaces yet</h3>
-                            <p>Create your first workspace to get started</p>
-                        </div>
-                    ) : (
-                        <div className="workspace-grid">
-                            {workspaces.map((workspace) => (
-                                <div key={workspace._id} className="workspace-card">
-                                    <div className="card-header">
-                                        <div className="card-icon">
-                                            {workspace.name.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div className="card-actions">
-                                            <button
-                                                className="action-btn edit"
-                                                onClick={() => handleEdit(workspace)}
-                                                title="Edit"
-                                            >
-                                                <FiEdit2 size={16} />
-                                            </button>
-                                            <button
-                                                className="action-btn delete"
-                                                onClick={() => handleDelete(workspace._id)}
-                                                title="Delete"
-                                            >
-                                                <FiTrash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="card-body">
-                                        <h3>{workspace.name}</h3>
-                                        <p>{workspace.description}</p>
-                                    </div>
-
-                                    <div className="card-footer">
-                                        <span className="owner-tag">
-                                            <FiUsers size={12} /> {workspace.owner_id || "Unknown Owner"}
-                                        </span>
-                                        <span className="workspace-id">
-                                            ID: {workspace._id.slice(-8)}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
         </div>
     );

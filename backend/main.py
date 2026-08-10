@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routes.workspace import router as workspace_router
 from routes.auth import router as auth_router
+from routes.paper import router as paper_router  # ← ADD THIS
 
 
 app = FastAPI()
@@ -27,6 +28,8 @@ app.include_router(
     prefix="/auth",
     tags=["Authentication"]
 )
+
+app.include_router(paper_router)  # ← ADD THIS
 
 
 @app.get("/")
