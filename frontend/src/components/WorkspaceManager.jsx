@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
-import { FiPlus, FiEdit2, FiTrash2, FiFolder, FiUsers, FiGrid, FiX, FiAlertCircle } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiFolder, FiUsers, FiGrid, FiX, FiAlertCircle, FiFileText, FiBook } from "react-icons/fi";
 import { createWorkspace, getWorkspaces, deleteWorkspace, updateWorkspace, getWorkspace } from "../api/workspaceApi";
 import "../styles/workspace.css";
 
+// Paper Components
 import PaperUpload from './papers/PaperUpload';
 import PaperList from './papers/PaperList';
 import PaperSearch from './papers/PaperSearch';
 import PaperDashboard from './papers/PaperDashboard';
 import PaperReader from './papers/PaperReader';
+
+// Document Components
+import DocumentUpload from './documents/DocumentUpload';
+import DocumentList from './documents/DocumentList';
+import DocumentDashboard from './documents/DocumentDashboard';
+import DocumentViewer from './documents/DocumentViewer';
+
 import "../styles/papers.css";
+import "../styles/documents.css";
 
 function WorkspaceManager() {
     const [workspaces, setWorkspaces] = useState([]);
@@ -21,9 +30,13 @@ function WorkspaceManager() {
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
     const [selectedWorkspace, setSelectedWorkspace] = useState(null);
     const [showPapers, setShowPapers] = useState(false);
-    
+    const [showDocuments, setShowDocuments] = useState(false);
     const [showReader, setShowReader] = useState(false);
     const [selectedPaper, setSelectedPaper] = useState(null);
+    
+    // Document Viewer States
+    const [showDocumentViewer, setShowDocumentViewer] = useState(false);
+    const [selectedDocument, setSelectedDocument] = useState(null);
 
     useEffect(() => {
         loadWorkspaces();
@@ -148,24 +161,32 @@ function WorkspaceManager() {
         setSelectedWorkspaceId(workspace._id);
         setSelectedWorkspace(workspace);
         setShowPapers(true);
+        setShowDocuments(false);
         setShowReader(false);
         setSelectedPaper(null);
+        setShowDocumentViewer(false);
+        setSelectedDocument(null);
     };
 
     const handleBackToWorkspaces = () => {
         setShowPapers(false);
+        setShowDocuments(false);
         setSelectedWorkspaceId(null);
         setSelectedWorkspace(null);
         setShowReader(false);
         setSelectedPaper(null);
+        setShowDocumentViewer(false);
+        setSelectedDocument(null);
     };
 
     const handlePaperUploadComplete = async () => {
         await loadWorkspaces();
         if (selectedWorkspaceId) {
-            const updated = workspaces.find(w => w._id === selectedWorkspaceId);
-            if (updated) {
-                setSelectedWorkspace(updated);
+            try {
+                const response = await getWorkspace(selectedWorkspaceId);
+                setSelectedWorkspace(response);
+            } catch (error) {
+                console.error('Error refreshing workspace:', error);
             }
         }
     };
@@ -181,20 +202,40 @@ function WorkspaceManager() {
         }
     };
 
-    // Handle clicking a paper to open the reader
+    const handleDocumentUploadComplete = async () => {
+        await loadWorkspaces();
+        if (selectedWorkspaceId) {
+            try {
+                const response = await getWorkspace(selectedWorkspaceId);
+                setSelectedWorkspace(response);
+            } catch (error) {
+                console.error('Error refreshing workspace:', error);
+            }
+        }
+    };
+
+    const handleDocumentDeleted = async () => {
+        if (selectedWorkspaceId) {
+            try {
+                const response = await getWorkspace(selectedWorkspaceId);
+                setSelectedWorkspace(response);
+            } catch (error) {
+                console.error('Error refreshing workspace:', error);
+            }
+        }
+    };
+
     const handlePaperClick = (paper) => {
         console.log('Opening paper:', paper.title);
         setSelectedPaper(paper);
         setShowReader(true);
     };
 
-    // Go back from reader to paper list
     const handleBackFromReader = () => {
         setShowReader(false);
         setSelectedPaper(null);
     };
 
-    // 🔥 NEW: Handle topic click from Knowledge Map
     const handleTopicClick = (paperId) => {
         console.log('Topic clicked - Opening paper:', paperId);
         
@@ -209,6 +250,18 @@ function WorkspaceManager() {
             console.log('Paper not found with ID:', paperId);
             alert('Paper not found. It may have been deleted.');
         }
+    };
+
+    // Document Viewer Handlers
+    const handleDocumentClick = (document) => {
+        console.log('Opening document:', document.name || document.filename);
+        setSelectedDocument(document);
+        setShowDocumentViewer(true);
+    };
+
+    const handleBackFromDocumentViewer = () => {
+        setShowDocumentViewer(false);
+        setSelectedDocument(null);
     };
 
     return (
@@ -228,26 +281,36 @@ function WorkspaceManager() {
                         </div>
                         <h1>
                             {showReader ? 'Reading Paper' : 
-                             showPapers ? selectedWorkspace?.name || 'Papers' : 
+                             showDocumentViewer ? 'Viewing Document' :
+                             showPapers ? selectedWorkspace?.name || 'Papers' :
+                             showDocuments ? selectedWorkspace?.name || 'Documents' :
                              'Your Workspaces'}
                         </h1>
                         <p className="subtitle">
                             {showReader ? selectedPaper?.title || 'Paper' :
+                             showDocumentViewer ? selectedDocument?.name || selectedDocument?.filename || 'Document' :
                              showPapers ? `Manage research papers in "${selectedWorkspace?.name}"` :
+                             showDocuments ? `Manage documents in "${selectedWorkspace?.name}"` :
                              'Manage your research and project workspaces efficiently'}
                         </p>
                     </div>
                     <div className="header-stats">
-                        {!showPapers && !showReader && (
+                        {!showPapers && !showDocuments && !showReader && !showDocumentViewer && (
                             <div className="stat-card">
                                 <span className="stat-number">{workspaces.length}</span>
                                 <span className="stat-label">Total Workspaces</span>
                             </div>
                         )}
-                        {showPapers && selectedWorkspace && !showReader && (
+                        {showPapers && selectedWorkspace && !showReader && !showDocumentViewer && (
                             <div className="stat-card">
                                 <span className="stat-number">{selectedWorkspace.papers?.length || 0}</span>
                                 <span className="stat-label">Papers</span>
+                            </div>
+                        )}
+                        {showDocuments && selectedWorkspace && !showReader && !showDocumentViewer && (
+                            <div className="stat-card">
+                                <span className="stat-number">{selectedWorkspace.documents?.length || 0}</span>
+                                <span className="stat-label">Documents</span>
                             </div>
                         )}
                     </div>
@@ -336,8 +399,8 @@ function WorkspaceManager() {
                     </div>
                 )}
 
-                {/* Show Workspace Form (only when not viewing papers or reader) */}
-                {!showPapers && !showReader && (
+                {/* Show Workspace Form */}
+                {!showPapers && !showDocuments && !showReader && !showDocumentViewer && (
                     <div className="form-card">
                         <div className="form-header">
                             <h2>
@@ -404,33 +467,39 @@ function WorkspaceManager() {
                     />
                 )}
 
-                {/* Paper Management View */}
-                {showPapers && selectedWorkspaceId && !showReader && (
-                    <>
-                        <button 
-                            onClick={handleBackToWorkspaces}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 20px',
-                                marginBottom: '20px',
-                                background: 'rgba(255,255,255,0.05)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                borderRadius: '10px',
-                                color: '#94a3b8',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                transition: 'all 0.3s',
-                                fontFamily: 'Inter, sans-serif'
-                            }}
-                            onMouseEnter={(e) => { e.target.style.background = 'rgba(255,255,255,0.1)'; }}
-                            onMouseLeave={(e) => { e.target.style.background = 'rgba(255,255,255,0.05)'; }}
-                        >
-                            Back to Workspaces
-                        </button>
+                {/* Document Viewer View */}
+                {showDocumentViewer && selectedDocument && selectedWorkspaceId && (
+                    <DocumentViewer 
+                        document={selectedDocument}
+                        workspaceId={selectedWorkspaceId}
+                        onBack={handleBackFromDocumentViewer}
+                    />
+                )}
 
-                        {/* 🔥 Pass onTopicClick to PaperDashboard */}
+                {/* Paper Management View */}
+                {showPapers && selectedWorkspaceId && !showReader && !showDocumentViewer && (
+                    <>
+                        <div className="workspace-nav">
+                            <button 
+                                className={`nav-btn ${showPapers ? 'active' : ''}`}
+                                onClick={() => { setShowPapers(true); setShowDocuments(false); }}
+                            >
+                                <FiBook /> Papers
+                            </button>
+                            <button 
+                                className={`nav-btn ${showDocuments ? 'active' : ''}`}
+                                onClick={() => { setShowPapers(false); setShowDocuments(true); }}
+                            >
+                                <FiFileText /> Documents
+                            </button>
+                            <button 
+                                className="nav-btn back"
+                                onClick={handleBackToWorkspaces}
+                            >
+                                Back to Workspaces
+                            </button>
+                        </div>
+
                         <PaperDashboard 
                             workspaceId={selectedWorkspaceId} 
                             onTopicClick={handleTopicClick}
@@ -452,8 +521,48 @@ function WorkspaceManager() {
                     </>
                 )}
 
-                {/* Workspace List (only when not viewing papers or reader) */}
-                {!showPapers && !showReader && (
+                {/* Document Management View */}
+                {showDocuments && selectedWorkspaceId && !showReader && !showDocumentViewer && (
+                    <>
+                        <div className="workspace-nav">
+                            <button 
+                                className={`nav-btn ${showPapers ? 'active' : ''}`}
+                                onClick={() => { setShowPapers(true); setShowDocuments(false); }}
+                            >
+                                <FiBook /> Papers
+                            </button>
+                            <button 
+                                className={`nav-btn ${showDocuments ? 'active' : ''}`}
+                                onClick={() => { setShowPapers(false); setShowDocuments(true); }}
+                            >
+                                <FiFileText /> Documents
+                            </button>
+                            <button 
+                                className="nav-btn back"
+                                onClick={handleBackToWorkspaces}
+                            >
+                                Back to Workspaces
+                            </button>
+                        </div>
+
+                        <DocumentDashboard workspaceId={selectedWorkspaceId} />
+
+                        <DocumentUpload 
+                            workspaceId={selectedWorkspaceId} 
+                            onUploadComplete={handleDocumentUploadComplete}
+                        />
+
+                        <DocumentList 
+                            documents={selectedWorkspace?.documents || []} 
+                            workspaceId={selectedWorkspaceId}
+                            onDocumentDeleted={handleDocumentDeleted}
+                            onDocumentClick={handleDocumentClick}
+                        />
+                    </>
+                )}
+
+                {/* Workspace List */}
+                {!showPapers && !showDocuments && !showReader && !showDocumentViewer && (
                     <div className="workspace-list">
                         <div className="list-header">
                             <h2>All Workspaces</h2>
@@ -507,7 +616,7 @@ function WorkspaceManager() {
                                             <h3>{workspace.name}</h3>
                                             <p>{workspace.description}</p>
                                             <small style={{ color: '#64748b', fontSize: '12px' }}>
-                                                Papers: {workspace.papers?.length || 0}
+                                                📄 Papers: {workspace.papers?.length || 0} &nbsp;|&nbsp; 📁 Documents: {workspace.documents?.length || 0}
                                             </small>
                                         </div>
 
