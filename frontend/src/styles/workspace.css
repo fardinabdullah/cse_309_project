@@ -823,3 +823,52 @@
     display: block;
     margin-top: 4px;
 }
+
+/* ================================
+   WORKSPACE NAVIGATION
+================================ */
+
+.workspace-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.workspace-nav .nav-btn {
+    padding: 10px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workspace-nav .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+}
+
+.workspace-nav .nav-btn.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+.workspace-nav .nav-btn.back {
+    margin-left: auto;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+}
+
+.workspace-nav .nav-btn.back:hover {
+    background: rgba(239, 68, 68, 0.15);
+}

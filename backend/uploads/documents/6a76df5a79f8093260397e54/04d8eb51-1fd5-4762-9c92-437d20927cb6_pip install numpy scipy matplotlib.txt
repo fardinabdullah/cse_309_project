@@ -1,0 +1,3 @@
+pip install numpy scipy matplotlib astropy specutils requests
+
+pip install phoenix4all
