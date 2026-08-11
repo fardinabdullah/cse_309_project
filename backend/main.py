@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routes.workspace import router as workspace_router
 from routes.auth import router as auth_router
-
+from routes.paper import router as paper_router
+from routes.reading import router as reading_router      # NEW
+from routes.topics import router as topics_router        # NEW
 
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,18 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(workspace_router)
-
-app.include_router(
-    auth_router,
-    prefix="/auth",
-    tags=["Authentication"]
-)
-
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(paper_router)
+app.include_router(reading_router)      # NEW
+app.include_router(topics_router)       # NEW
 
 @app.get("/")
 def home():
-    return {
-        "message": "Smart Workspace Manager API"
-    }
+    return {"message": "Smart Workspace Manager API"}
