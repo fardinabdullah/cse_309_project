@@ -3,6 +3,7 @@ import axios from "axios";
 
 //const API_URL = "http://127.0.0.1:8000/auth";
 const API_URL = "https://smart-workspace-backend.onrender.com/auth";
+console.log(" Using live backend URL:", API_URL);   // <-- ADD THIS LINE
 
 // Signup
 export const signup = async (userData) => {
