@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiSearch, FiFile, FiExternalLink } from 'react-icons/fi';
 import { searchPapers } from '../../api/paperApi';
+import { PAPERS_URL } from '../../api/config';
 
 function PaperSearch({ workspaceId }) {
     const [query, setQuery] = useState('');
@@ -28,7 +29,7 @@ function PaperSearch({ workspaceId }) {
             alert('Paper ID not found');
             return;
         }
-        const url = `http://127.0.0.1:8000/papers/view/${paperId}?workspace_id=${workspaceId}`;
+        const url = `${PAPERS_URL}/view/${paperId}?workspace_id=${workspaceId}`;
         window.open(url, '_blank');
     };
 

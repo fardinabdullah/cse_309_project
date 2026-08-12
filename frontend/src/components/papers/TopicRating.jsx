@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiThumbsUp, FiMeh, FiThumbsDown, FiStar } from 'react-icons/fi';
+import { TOPICS_URL } from '../../api/config';
 
 function TopicRating({ paperId, workspaceId, section, onRated, paperTitle }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +19,7 @@ function TopicRating({ paperId, workspaceId, section, onRated, paperTitle }) {
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/topics/add?topic=${encodeURIComponent(topicName)}&category=${category}&paper_id=${paperId}&section=${encodeURIComponent(section)}&workspace_id=${workspaceId}`,
+                `${TOPICS_URL}/add?topic=${encodeURIComponent(topicName)}&category=${category}&paper_id=${paperId}&section=${encodeURIComponent(section)}&workspace_id=${workspaceId}`,
                 {
                     method: 'POST',
                     headers: {

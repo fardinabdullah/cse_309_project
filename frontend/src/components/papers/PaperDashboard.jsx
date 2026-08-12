@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getPaperDashboard } from '../../api/paperApi';
+import { TOPICS_URL } from '../../api/config';
 
 function PaperDashboard({ workspaceId, onTopicClick }) {
     const [stats, setStats] = useState(null);
@@ -25,7 +26,7 @@ function PaperDashboard({ workspaceId, onTopicClick }) {
 
     const fetchTopics = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/topics/all', {
+            const response = await fetch(`${TOPICS_URL}/all`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

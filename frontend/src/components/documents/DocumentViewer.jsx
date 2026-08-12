@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiArrowLeft, FiDownload, FiEye } from 'react-icons/fi';
+import { DOCUMENTS_URL } from '../../api/config';
 
 function DocumentViewer({ document, workspaceId, onBack }) {
     const [fileUrl, setFileUrl] = useState(null);
@@ -19,7 +20,7 @@ function DocumentViewer({ document, workspaceId, onBack }) {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://127.0.0.1:8000/documents/view/${docId}?workspace_id=${workspaceId}`,
+                `${DOCUMENTS_URL}/view/${docId}?workspace_id=${workspaceId}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -121,7 +122,7 @@ function DocumentViewer({ document, workspaceId, onBack }) {
                     <h3>{document.name || document.filename}</h3>
                     <p>File type: {getFileTypeLabel(document.file_type)}</p>
                     <a 
-                        href={`http://127.0.0.1:8000/documents/view/${docId}?workspace_id=${workspaceId}`}
+                        href={`${DOCUMENTS_URL}/view/${docId}?workspace_id=${workspaceId}`}
                         className="download-file-btn"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -192,7 +193,7 @@ function DocumentViewer({ document, workspaceId, onBack }) {
                             <FiDownload /> Download to View
                         </a>
                         <a 
-                            href={`http://127.0.0.1:8000/documents/view/${docId}?workspace_id=${workspaceId}`}
+                            href={`${DOCUMENTS_URL}/view/${docId}?workspace_id=${workspaceId}`}
                             className="open-in-new-btn"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -235,7 +236,7 @@ function DocumentViewer({ document, workspaceId, onBack }) {
                     </p>
                 </div>
                 <a 
-                    href={fileUrl || `http://127.0.0.1:8000/documents/view/${docId}?workspace_id=${workspaceId}`}
+                    href={fileUrl || `${DOCUMENTS_URL}/view/${docId}?workspace_id=${workspaceId}`}
                     download={document.filename}
                     className="download-btn"
                     target="_blank"

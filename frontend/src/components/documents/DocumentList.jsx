@@ -1,6 +1,7 @@
 import { FiFile, FiTrash2, FiEye } from 'react-icons/fi';
 import { useState } from 'react';
 import { deleteDocument } from '../../api/documentApi';
+import { DOCUMENTS_URL } from '../../api/config';
 
 function DocumentList({ documents, workspaceId, onDocumentDeleted, onDocumentClick }) {
     const [deletingId, setDeletingId] = useState(null);
@@ -28,7 +29,7 @@ function DocumentList({ documents, workspaceId, onDocumentDeleted, onDocumentCli
         
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/documents/view/${docId}?workspace_id=${workspaceId}`,
+                `${DOCUMENTS_URL}/view/${docId}?workspace_id=${workspaceId}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`

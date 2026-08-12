@@ -11,6 +11,7 @@ import {
     FiMinimize
 } from 'react-icons/fi';
 import TopicRating from './TopicRating';
+import { PAPERS_URL, READING_URL } from '../../api/config';
 
 function PaperReader({ paper, workspaceId, onBack }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +51,7 @@ function PaperReader({ paper, workspaceId, onBack }) {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://127.0.0.1:8000/papers/view/${paperId}?workspace_id=${workspaceId}`,
+                `${PAPERS_URL}/view/${paperId}?workspace_id=${workspaceId}`,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -84,7 +85,7 @@ function PaperReader({ paper, workspaceId, onBack }) {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://127.0.0.1:8000/reading/progress/${paperId}?workspace_id=${workspaceId}`,
+                `${READING_URL}/progress/${paperId}?workspace_id=${workspaceId}`,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -119,7 +120,7 @@ function PaperReader({ paper, workspaceId, onBack }) {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://127.0.0.1:8000/reading/progress?paper_id=${paperId}&workspace_id=${workspaceId}&page=${page}`,
+                `${READING_URL}/progress?paper_id=${paperId}&workspace_id=${workspaceId}&page=${page}`,
                 {
                     method: 'POST',
                     headers: {
@@ -280,7 +281,7 @@ function PaperReader({ paper, workspaceId, onBack }) {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://127.0.0.1:8000/reading/search/${paperId}?query=${encodeURIComponent(searchQuery)}&workspace_id=${workspaceId}`,
+                `${READING_URL}/search/${paperId}?query=${encodeURIComponent(searchQuery)}&workspace_id=${workspaceId}`,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -488,7 +489,6 @@ function PaperReader({ paper, workspaceId, onBack }) {
 
             {/* 🔥 Topic Rating Section */}
             {showRating && (
-                
                 <TopicRating 
                     paperId={paperId}
                     workspaceId={workspaceId}
@@ -497,9 +497,9 @@ function PaperReader({ paper, workspaceId, onBack }) {
                     onRated={() => {
                         setShowRating(false);
                         // Refresh dashboard data
-        }}
-    />
-)}
+                    }}
+                />
+            )}
         </div>
     );
 }

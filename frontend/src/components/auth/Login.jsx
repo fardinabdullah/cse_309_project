@@ -12,6 +12,7 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import "../../styles/login.css";
+import { AUTH_URL } from "../../api/config";
 
 function Login({ onLogin, onSwitchToSignup }) {
     const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ function Login({ onLogin, onSwitchToSignup }) {
 
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/auth/login",
+                `${AUTH_URL}/login`,
                 {
                     email,
                     password

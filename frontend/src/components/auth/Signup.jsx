@@ -12,6 +12,7 @@ import {
     FiZap
 } from "react-icons/fi";
 import "../../styles/login.css";
+import { AUTH_URL } from "../../api/config";
 
 function Signup({ onSwitchToLogin }) {
     const [formData, setFormData] = useState({
@@ -48,9 +49,8 @@ function Signup({ onSwitchToLogin }) {
         setLoading(true);
 
         try {
-            // ✅ FIXED: Changed from /auth/register to /auth/signup
             const response = await axios.post(
-                "http://127.0.0.1:8000/auth/signup",
+                `${AUTH_URL}/signup`,
                 {
                     name: formData.name,
                     email: formData.email,
